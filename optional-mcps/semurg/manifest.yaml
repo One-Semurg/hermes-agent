@@ -1,0 +1,44 @@
+# Nous-approved MCP catalog entry.
+# Presence in this directory = approval. Merged via PR review.
+manifest_version: 1
+
+name: semurg
+description: >-
+  Self-hosted memory for agents: facts, passages and cited answers from a knowledge graph on your own machine.
+source: https://one.semurg.io/llms.txt
+
+# A Semurg node the user runs on their own Linux machine (URL-only: Hermes never spawns a local process for
+# this entry). Streamable HTTP with a static bearer token: the node's API token, sent as the Authorization header.
+transport:
+  type: http
+  url: "${SEMURG_MCP_URL}"
+
+auth:
+  type: api_key
+  env:
+    - name: SEMURG_MCP_URL
+      prompt: "Semurg MCP URL (a node on this machine serves http://127.0.0.1:4000/v1/mcp)"
+      required: true
+      secret: false
+      default: "http://127.0.0.1:4000/v1/mcp"
+    - name: MCP_SEMURG_API_KEY
+      prompt: "Semurg API token (on the node: sudo grep '^SEMURG_API_TOKEN=' /etc/semurg/semurg.env | cut -d= -f2-)"
+      required: true
+      secret: true
+
+# Composer-suggestion triggers (desktop brand pills).
+suggest:
+  keywords:
+    - semurg
+    - agent memory
+    - knowledge graph
+
+post_install: |
+  Semurg runs on your own x86_64 Linux machine. Install a node with
+  `curl -fsSL https://one.semurg.io/install | sudo bash` (read the script first with `| less`).
+  The installer says where the node's API token is stored; that token is the API key Hermes asks for.
+
+  Tools: memory_status, memory_remember, memory_recall, memory_relate, memory_context,
+  memory_document, memory_forget, memory_export, memory_import. Pass `scope` on each call to keep
+  separate memories apart (one per project or end user).
+  Start a new session or use /reload-mcp after setup.
